@@ -81,11 +81,10 @@ def getLinks (word, lang="jpn"):
                 for sl in synlinks:
                     print('　　[関係]', sl.link, getSynsetDef(sl.synset2, lang).define)
                     syns = getWordsFromSynset(sl.synset2, lang)
-                    print(' 　　　(単語)', end='')
+                    print(' 　　　(単語)', )
                     for sy in syns:
-                        print(sy.lemma + ",", end='')
+                        print(sy.lemma + ",", )
                         
-                    print("")
                     print("")
 
     return
