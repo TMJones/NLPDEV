@@ -1,2 +1,0 @@
-/usr/bin/ar cr libProc.a  CMakeFiles/Proc.dir/Proc_response.c.o
-/usr/bin/ranlib libProc.a
