@@ -1,0 +1,2 @@
+/usr/bin/ar cr libIF.a  CMakeFiles/IF.dir/IF_input.c.o CMakeFiles/IF.dir/IF_output.c.o
+/usr/bin/ranlib libIF.a

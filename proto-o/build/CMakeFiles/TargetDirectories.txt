@@ -1,0 +1,3 @@
+/home/vagrant/git/proto-o/build/IF/CMakeFiles/IF.dir
+/home/vagrant/git/proto-o/build/Proc/CMakeFiles/Proc.dir
+/home/vagrant/git/proto-o/build/CMakeFiles/proto-o.dir

@@ -1,0 +1,1 @@
+/usr/bin/cc      CMakeFiles/proto-o.dir/main.c.o  -o proto-o -rdynamic IF/libIF.a Proc/libProc.a 
