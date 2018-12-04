@@ -7,7 +7,7 @@ include_directories( ${CMAKE_HOME_DIRECTORY}/Proc/include )
 add_executable(proto-o main.c)
 target_link_libraries(proto-o
 				IF
-				Proc
+#				Proc
 )
 
 add_subdirectory(IF)

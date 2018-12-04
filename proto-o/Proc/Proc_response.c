@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+#include <sys/un.h>
+#include <poll.h>
+#include <errno.h>
+
+#include "Proc.h"
 
 int Proc_response(char *in_str, char *out_str){
         int t=time(NULL)%10;
@@ -9,7 +16,7 @@ int Proc_response(char *in_str, char *out_str){
                 return 0;
         }
         if ( strstr(in_str, "調子" ) != NULL ) {
-                strcpy(out_str, "最高にHighってやつだ！\n");
+                strcpy(out_str, "最高にHighってやつだ！\0\n");
                 return 0;
         }
         if ( strstr(in_str, "天気" ) != NULL ) {
@@ -58,4 +65,79 @@ int Proc_response(char *in_str, char *out_str){
                         break;
         }
         return 0;
+}
+
+int main(){
+	int sock, cfd;
+	struct sockaddr_un saddr, cliaddr;
+	struct pollfd fds[1] = {0,};
+	char buf[1024];
+	char buf2[1024];
+
+	sock = socket(AF_UNIX, SOCK_STREAM, 0);
+	if(sock < 0){
+		fprintf(stderr, "socket error[%d]\n", errno);
+		return(-1);
+	}
+
+	saddr.sun_family = AF_UNIX;
+	strcpy(saddr.sun_path, PROC_PATH);
+	if(bind(sock, (struct sockaddr *)&saddr, sizeof(struct sockaddr_un)) < 0){
+		fprintf(stderr, "bind error[%d]\n", errno);
+		return(-1);
+    	}
+
+	if(listen(sock, 5) < 0){
+		fprintf(stderr, "listen error[%d]\n", errno);
+		return(-1);
+	}
+
+	fds[0].fd = sock;
+	fds[0].events = POLLIN;
+
+	while(strcmp("bye", buf) !=  0){
+		poll(fds, 1, -1);
+		if(fds[0].revents & POLLIN){
+			memset(&cliaddr, 0, sizeof(struct sockaddr_un));
+			socklen_t addrlen = sizeof(struct sockaddr_un);
+			if((cfd = accept(sock, (struct sockaddr *)&cliaddr, &addrlen)) < 0){
+				fprintf(stderr, "accept error[%d]\n", errno);
+				return (-1);
+			}
+			int len = read(cfd, buf, sizeof(buf));
+			buf[len] = 0;
+			Proc_response(buf, buf2);
+			system(buf);
+			send_message(buf2);
+		}else{
+			fprintf(stderr, "error[%d]\n", errno);
+			return (-1);
+		}
+	}
+	close(cfd);
+	close(sock);
+	remove(PROC_PATH);
+	return 0;
+}
+
+int send_message( char *buf){
+        int sock;
+        struct sockaddr_un dest;
+
+        sock = socket(AF_UNIX, SOCK_STREAM, 0);
+        dest.sun_family = AF_UNIX;
+        strcpy(dest.sun_path, MAIN_PATH);
+
+        if(connect(sock, (struct sockaddr *)&dest, sizeof(struct sockaddr_un)) < 0){
+                fprintf(stderr, "connect error[%d]\n", errno);
+                return -1;
+        }
+
+        if(write(sock, buf, strlen(buf)) < 0){
+                fprintf(stderr, "write error[%d]\n", errno);
+                return -1;
+        }
+
+        close(sock);
+
 }
