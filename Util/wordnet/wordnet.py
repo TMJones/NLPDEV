@@ -3,9 +3,9 @@
 # 
 import sys, sqlite3
 from collections import namedtuple
-from pprint import pprint
 
 conn = sqlite3.connect("./wnjpn.db")
+conn.text_factory = str
 
 Word = namedtuple('Word', 'wordid lang lemma pron pos')
 Sense = namedtuple('Sense', 'synset wordid lang rank lexid freq src')
@@ -40,34 +40,30 @@ def getWordsFromSynset(synset, lang):
 def getWordsFromSenses(sense, lang="jpn"):
   synonym = {}
   for s in sense:
-    lemmas = []
+    print("[" + getSynsetDef(s.synset, lang).define + "]");
     syns = getWordsFromSynset(s.synset, lang)
     for sy in syns:
-      lemmas.append(sy.lemma)
-    synonym[getSynset(s.synset).name] = lemmas
+      print(sy.lemma)
   return synonym
 
 def getSynonyms (word):
-    synonym = {}
     words = getWords(word)
     if words:
         for w in words:
             sense = getSenses(w)
-            s = getWordsFromSenses(sense)
-            synonym = dict(list(synonym.items()) + list(s.items()))
-    return synonym
+            synonyms = getWordsFromSenses(sense)
+               
+    return
 
 def getConcepts (word, lang="jpn"):
-    concepts = {}
     words = getWords(word)
     if words:
         for w in words:
             sense = getSenses(w)
             for s in sense:
                 sd = getSynsetDef(s.synset, lang)
-                concepts[sd.synset] = sd.define
-                
-    return concepts
+                print(sd.define)
+    return
 
 def getLinks (word, lang="jpn"):
     words = getWords(word)
@@ -76,18 +72,14 @@ def getLinks (word, lang="jpn"):
             sense = getSenses(w)
             for s in sense:
                 sd = getSynsetDef(s.synset, lang)
-                print('【概念】', sd.define)
+                print("[" + sd.define + "]")
                 synlinks = GetSynlinks(s.synset)
                 for sl in synlinks:
-                    print('　　[関係]', sl.link, getSynsetDef(sl.synset2, lang).define)
+                    print("(" + sl.link + ")" + getSynsetDef(sl.synset2, lang).define)
                     syns = getWordsFromSynset(sl.synset2, lang)
-                    print(' 　　　(単語)', end='')
                     for sy in syns:
-                        print(sy.lemma + ",", end='')
+                        print(sy.lemma)
                         
-                    print("")
-                    print("")
-
     return
             
             
@@ -95,10 +87,8 @@ if __name__ == '__main__':
     if len(sys.argv) >= 3:
         if sys.argv[1] == 'GetConcepts':
             concepts = getConcepts(sys.argv[2])
-            pprint(concepts)
         elif sys.argv[1] == 'GetSynonyms':
             synonyms = getSynonyms(sys.argv[2])
-            pprint(synonyms)
         elif sys.argv[1] == 'GetLinks':
             getLinks(sys.argv[2])
             
