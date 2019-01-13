@@ -79,7 +79,6 @@ def getLinks (word, lang="jpn"):
                     syns = getWordsFromSynset(sl.synset2, lang)
                     for sy in syns:
                         print(sy.lemma)
-                        
     return
             
             
